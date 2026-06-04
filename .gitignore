@@ -3,3 +3,10 @@
 /.superpowers/
 /plans/
 /specs/
+/.claude/
+/demo/
+__pycache__/
+*.pyc
+blog-frontend/node_modules/
+blog-frontend/.next/
+
