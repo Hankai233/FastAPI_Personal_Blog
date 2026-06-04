@@ -1,3 +1,5 @@
+[English](README.md) | [中文](README_CN.md)
+
 # Personal Blog API
 
 A personal blog API backend built with **FastAPI** + **SQLAlchemy** + **MariaDB**, featuring JWT authentication, Markdown rendering, full-text search, RSS feed generation, and a complete admin panel API.

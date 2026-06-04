@@ -1,3 +1,5 @@
+[English](README.md) | [中文](README_CN.md)
+
 # Personal Blog API
 
 基于 **FastAPI** + **SQLAlchemy** + **MariaDB** 构建的个人博客 API 后端，支持 JWT 认证、Markdown 渲染、全文搜索、RSS 订阅源生成，以及完整的管理后台 API。
