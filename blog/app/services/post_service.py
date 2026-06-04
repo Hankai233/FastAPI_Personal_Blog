@@ -39,8 +39,6 @@ def get_posts(
     query = db.query(Post)
     if status:
         query = query.filter(Post.status == PostStatus(status))
-    else:
-        query = query.filter(Post.status == PostStatus.published)
 
     if tag_slug:
         tag = db.query(Tag).filter(Tag.slug == tag_slug).first()

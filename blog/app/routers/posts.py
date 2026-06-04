@@ -17,7 +17,7 @@ def list_posts(
     tag: str | None = None,
     db: Session = Depends(get_db),
 ):
-    posts, total = post_service.get_posts(db, page=page, page_size=page_size, tag_slug=tag)
+    posts, total = post_service.get_posts(db, page=page, page_size=page_size, tag_slug=tag, status="published")
     return {
         "data": [PostListRead.model_validate(p) for p in posts],
         "total": total,
@@ -30,6 +30,46 @@ def list_posts(
 def get_post(slug: str, db: Session = Depends(get_db)):
     post = post_service.get_post_by_slug(db, slug, status="published")
     return post
+
+
+@admin_router.get("")
+def admin_list_posts(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=50),
+    status: str | None = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    posts, total = post_service.get_posts(db, page=page, page_size=page_size, status=status)
+    return {
+        "data": [PostListRead.model_validate(p) for p in posts],
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+    }
+
+
+@admin_router.get("/{slug}")
+def admin_get_post(
+    slug: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    post = post_service.get_post_by_slug(db, slug)
+    return {
+        "id": post.id,
+        "title": post.title,
+        "slug": post.slug,
+        "content_md": post.content_md,
+        "content_html": post.content_html,
+        "excerpt": post.excerpt,
+        "status": post.status.value,
+        "tags": [{"id": t.id, "name": t.name, "slug": t.slug} for t in post.tags],
+        "author_id": post.author_id,
+        "created_at": post.created_at.isoformat() if post.created_at else None,
+        "updated_at": post.updated_at.isoformat() if post.updated_at else None,
+        "published_at": post.published_at.isoformat() if post.published_at else None,
+    }
 
 
 @admin_router.post("", response_model=PostRead, status_code=201)
