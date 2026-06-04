@@ -1,19 +1,51 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from app.core.database import get_db
 from app.core.exceptions import AppException
 from app.dependencies import get_current_user
 from app.schemas.tag import TagCreate, TagUpdate, TagRead
-from app.models.tag import Tag
+from app.models.tag import Tag, post_tags
 from app.models.user import User
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/api/tags", tags=["tags"])
 admin_router = APIRouter(prefix="/api/admin/tags", tags=["admin-tags"])
 
 
+class TagWithCount(BaseModel):
+    id: int
+    name: str
+    slug: str
+    post_count: int
+
+    model_config = {"from_attributes": True}
+
+
 @router.get("", response_model=list[TagRead])
 def list_tags(db: Session = Depends(get_db)):
     return db.query(Tag).order_by(Tag.name).all()
+
+
+@router.get("/popular", response_model=list[TagWithCount])
+def list_popular_tags(limit: int = Query(10, ge=1, le=50), db: Session = Depends(get_db)):
+    tags_with_counts = (
+        db.query(Tag, func.count(post_tags.c.post_id).label("post_count"))
+        .outerjoin(post_tags)
+        .group_by(Tag.id)
+        .order_by(func.count(post_tags.c.post_id).desc())
+        .limit(limit)
+        .all()
+    )
+    return [
+        TagWithCount(
+            id=tag.id,
+            name=tag.name,
+            slug=tag.slug,
+            post_count=count,
+        )
+        for tag, count in tags_with_counts
+    ]
 
 
 @router.get("/{slug}", response_model=TagRead)

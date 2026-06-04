@@ -1,1 +1,2 @@
 {"type":"server-started","port":50258,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:50258","screen_dir":"/home/nikki/PycharmProjects/blog/.superpowers/brainstorm/28568-1780557152/content","state_dir":"/home/nikki/PycharmProjects/blog/.superpowers/brainstorm/28568-1780557152/state"}
+{"type":"server-stopped","reason":"idle timeout"}
